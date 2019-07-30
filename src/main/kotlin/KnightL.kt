@@ -3,7 +3,7 @@ package main.kotlin
 import java.util.*
 import kotlin.system.measureTimeMillis
 
-fun bfs(board: Board, startPosition: Position): Node? {
+fun bfs(board: Board, startPosition: Position): Int {
     val startNode = Node(position = startPosition)
 
     val bfsQueue: Queue<Node> = LinkedList()
@@ -15,9 +15,10 @@ fun bfs(board: Board, startPosition: Position): Node? {
     while (!bfsQueue.isEmpty()) {
         val currentNode = bfsQueue.remove()
         val currentNodePosition = currentNode.position
+        val currentNodeRank = currentNode.rank
 
         if (board.isGoal(currentNodePosition)) {
-            return currentNode
+            return currentNodeRank
         }
         val nonVisitedSuccessors = board.getSuccessors(currentNodePosition)
             .filter {
@@ -27,33 +28,18 @@ fun bfs(board: Board, startPosition: Position): Node? {
             }
 
         nonVisitedSuccessors.forEach {
-            val successorNode = Node(position = it, parent = currentNode)
+            val successorNode = Node(position = it, rank = currentNodeRank + 1)
             visited.add(successorNode)
             bfsQueue.add(successorNode)
         }
     }
-    return null
-}
-
-fun countNumberOfSteps(finishNode: Node?): Int {
-    if (finishNode == null)
-        return -1
-
-    var count = 0
-    var currentNode: Node? = finishNode
-    while (currentNode?.parent != null) {
-        count++
-        println(currentNode.position)
-        currentNode = currentNode.parent
-    }
-    return count
+    return -1
 }
 
 fun main() {
-    val board = Board(10, 11, 1)
+    val board = Board(10, 1, 1)
     val startPosition = Position(0, 0)
     println(measureTimeMillis {
-        val finalNode = bfs(board, startPosition)
-        println(countNumberOfSteps(finalNode))
+        println(bfs(board, startPosition))
     } / 1000f)
 }
